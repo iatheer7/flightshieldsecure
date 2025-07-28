@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>درع الطيران الآمن - كاشف الأعطال الذكي للطائرات</title>
+  <style>
+    
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9fbfd;
+      color: #1a202c;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+    h1 {
+      text-align: center;
+      color: #0a3d62;
+      font-weight: 800;
+      font-size: 2.8rem;
+      margin-bottom: 15px;
+      text-shadow: 0 1px 3px rgba(10,61,98,0.15);
+    }
+    h2 {
+      color: #0a3d62;
+      margin-bottom: 10px;
+      font-weight: 700;
+      border-bottom: 3px solid #0a3d62;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+
+   
+    #uploadSection {
+      background: #fff;
+      padding: 25px 30px;
+      max-width: 520px;
+      margin: 0 auto 35px auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(10,61,98,0.07);
+      transition: box-shadow 0.3s ease;
+    }
+    #uploadSection:hover {
+      box-shadow: 0 12px 28px rgba(10,61,98,0.12);
+    }
+    #uploadForm {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+    #uploadForm input[type="file"] {
+      flex-grow: 1;
+      padding: 10px 12px;
+      border: 1.8px solid #0a3d62;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+    #uploadForm input[type="file"]:hover {
+      border-color: #1769aa;
+    }
+    #uploadForm button {
+      background-color: #0a3d62;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(10,61,98,0.25);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #uploadForm button:hover {
+      background-color: #1769aa;
+      box-shadow: 0 6px 16px rgba(23,105,170,0.4);
+    }
+    #result {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #0a3d62;
+      min-height: 28px;
+      letter-spacing: 0.05em;
+    }
+
+    
+    #outputImage {
+      display: block;
+      margin: 25px auto 0 auto;
+      max-width: 90%;
+      max-height: 350px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(10,61,98,0.12);
+      border: 3px solid #0a3d62;
+      object-fit: contain;
+    }
+
+   
+    #dashboard {
+      max-width: 960px;
+      margin: 40px auto 0 auto;
+      background: #fff;
+      padding: 40px 35px;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(10,61,98,0.1);
+      user-select: none;
+    }
+    #dashboard h2 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-weight: 800;
+      font-size: 2rem;
+      color: #0a3d62;
+    }
+    .charts-container {
+      display: flex;
+      gap: 25px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 5px;
+    }
+    .chart-box {
+      min-width: 250px;
+      max-width: 250px;
+      height: 180px;
+      background: #f4f8fb;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(10,61,98,0.08);
+      padding: 15px 15px 25px 15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+    .chart-box:hover {
+      transform: scale(1.06);
+      box-shadow: 0 10px 28px rgba(10,61,98,0.15);
+    }
+
+    
+    .charts-container::-webkit-scrollbar {
+      height: 8px;
+    }
+    .charts-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .charts-container::-webkit-scrollbar-thumb {
+      background-color: #0a3d62aa;
+      border-radius: 4px;
+    }
+
+   
+    .chart-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #0a3d62;
+      text-align: center;
+      user-select: text;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h1>درع الطيران الآمن</h1>
+
+  <section id="uploadSection" aria-label="قسم رفع صورة الطائرة">
+    <h2>ارفع صورة الطائرة</h2>
+    <form id="uploadForm" aria-describedby="result">
+      <input type="file" id="imageInput" name="image" accept="image/*" required aria-label="اختيار صورة الطائرة" />
+      <button type="submit" aria-label="زر رفع الصورة">ارفع الصورة</button>
+    </form>
+    <p id="result" role="alert" aria-live="polite"></p>
+    <img id="outputImage" alt="صورة الطائرة بعد معالجة الأعطال" />
+  </section>
+
+  <section id="dashboard" aria-label="لوحة تحكم الأعطال">
+    <h2>لوحة تحكم الأعطال</h2>
+    <div class="charts-container" role="list" aria-label="مخططات الأعطال">
+      <div class="chart-box" role="listitem">
+        <canvas id="thermalChart" aria-label="مخطط الأعطال الحرارية" role="img"></canvas>
+      </div>
+      <div class="chart-box" role="listitem">
+        <canvas id="surfaceChart" aria-label="مخطط الأعطال السطحية" role="img"></canvas>
+      </div>
+      <div class="chart-box" role="listitem">
+        <canvas id="riskChart" aria-label="مخطط تقييم الخطورة" role="img"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <script>
+   
+    const thermalCtx = document.getElementById('thermalChart').getContext('2d');
+    const surfaceCtx = document.getElementById('surfaceChart').getContext('2d');
+    const riskCtx = document.getElementById('riskChart').getContext('2d');
+
+    const thermalChart = new Chart(thermalCtx, {
+      type: 'bar',
+      data: {
+        labels: ['محرك', 'جناح', 'ذيل', 'هيكل'],
+        datasets: [{
+          label: 'الأعطال الحرارية',
+          data: [0, 0, 0, 0],
+          backgroundColor: 'rgba(54, 162, 235, 0.75)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          borderRadius: 5,
+          barPercentage: 0.6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true, labels: { font: { size: 14, weight: 'bold' }, color: '#0a3d62' } },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { font: { size: 13, weight: 'bold', family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }, color: '#0a3d62' },
+            grid: { color: '#cbd5e1' }
+          },
+          x: {
+            ticks: { font: { size: 13, weight: 'bold' }, color: '#0a3d62' },
+            grid: { color: 'transparent' }
+          }
+        }
+      }
+    });
+
+    const surfaceChart = new Chart(surfaceCtx, {
+      type: 'pie',
+      data: {
+        labels: ['خدوش', 'كسور', 'تآكل', 'غير محدد'],
+        datasets: [{
+          label: 'الأعطال السطحية',
+          data: [0, 0, 0, 0],
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.85)',
+            'rgba(75, 192, 192, 0.85)',
+            'rgba(153, 102, 255, 0.85)',
+            'rgba(201, 203, 207, 0.85)'
+          ],
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 14, weight: 'bold' }, color: '#0a3d62' } },
+          tooltip: { enabled: true }
+        }
+      }
+    });
+
+    const riskChart = new Chart(riskCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['عالي', 'متوسط', 'منخفض'],
+        datasets: [{
+          label: 'درجة الخطورة',
+          data: [0, 0, 0],
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(255, 205, 86, 0.8)'
+          ],
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'right', labels: { font: { size: 14, weight: 'bold' }, color: '#0a3d62' } },
+          tooltip: { enabled: true }
+        }
+      }
+    });
+
+
+   
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const image = document.getElementById('imageInput').files[0];
+      if (!image) {
+        alert('يرجى اختيار صورة أولاً.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', image);
+
+      const response = await fetch('/process-image', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        alert('حدث خطأ أثناء معالجة الصورة.');
+        return;
+      }
+
+      const data = await response.json();
+
+      
+      document.getElementById('result').textContent = `عدد الكائنات المكتشفة: ${data.count}`;
+
+     
+      const outputImage = document.getElementById('outputImage');
+      outputImage.src = data.image + '?t=' + new Date().getTime();
+      outputImage.style.display = 'block';
+
+      
+      if (data.thermal_defects) {
+        thermalChart.data.datasets[0].data = data.thermal_defects;
+        thermalChart.update();
+      }
+      if (data.surface_defects) {
+        surfaceChart.data.datasets[0].data = data.surface_defects;
+        surfaceChart.update();
+      }
+      if (data.risk_levels) {
+        riskChart.data.datasets[0].data = data.risk_levels;
+        riskChart.update();
+      }
+    });
+  </script>
+
+</body>
+</html>

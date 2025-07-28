@@ -1,0 +1,21 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f8f9fa;
+  text-align: center;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.result img {
+  max-width: 100%;
+  margin-top: 15px;
+  border: 2px solid #333;
+}
+button {
+  margin-left: 10px;
+  padding: 8px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+}
